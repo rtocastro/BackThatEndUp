@@ -57,10 +57,24 @@ Category.update(
     },
   }
 )
+.then((updatedCategory) => {
+  // Sends the updated book as a json response
+  res.json(updatedCategory);
+})
+.catch((err) => res.json(err));
 });
 
 router.delete('/:id', (req, res) => {
   // delete a category by its `id` value
+   // Looks for the category based on ID given in the request parameters and deletes the instance from the database
+   Category.destroy({
+    where: {
+      id: req.params.id,
+    },
+  })
+    .then((deletedCategory) => {
+      res.json(deletedCategory);
+    })
+    .catch((err) => res.json(err));
 });
-
 module.exports = router;
