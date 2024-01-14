@@ -36,7 +36,7 @@ router.post('/', (req, res) => {
     .then((newCategory) => {
       // Send the newly created row as a JSON object
       res.json(newCategory);
-    })
+    })e
     .catch((err) => {
       res.json(err);
     });
@@ -45,7 +45,18 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
-  
+Category.update(
+  {
+    // All the fields you can update and the data attached to the request body.
+    id: req.body.id,
+  },
+  {
+    // Gets the data based on paramaters
+    where: {
+      id: req.params.id,
+    },
+  }
+)
 });
 
 router.delete('/:id', (req, res) => {
