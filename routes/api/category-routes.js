@@ -30,20 +30,16 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
-  try {
-    const categoryData = Category.findByOne(req.params.id, {
-      include: [{ model: Product }],
-    });
-
-    if (!categoryData) {
-      res.status(404).json({ message: 'No category with that ' });
-      return;
+  Category.findOne(
+    {
+      // Gets the book based on the isbn given in the request parameters
+      where: {
+        id: req.params.id
+      },
     }
-
-    res.status(200).json(idData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+  ).then((categoryData) => {
+    res.json(categoryData);
+  });
 });
 
 router.post('/', (req, res) => {
@@ -68,11 +64,13 @@ router.put('/:id', (req, res) => {
     {
       // All the fields you can update and the data attached to the request body.
       id: req.body.id,
+      category_name: req.body.category_name
     },
     {
       // Gets the data based on paramaters
       where: {
         id: req.params.id,
+        category_name: req.body.category_name
       },
     }
   )
@@ -89,6 +87,7 @@ router.delete('/:id', (req, res) => {
   Category.destroy({
     where: {
       id: req.params.id,
+      category_name: req.params.category_name
     },
   })
     .then((deletedCategory) => {
@@ -96,4 +95,5 @@ router.delete('/:id', (req, res) => {
     })
     .catch((err) => res.json(err));
 });
+
 module.exports = router;

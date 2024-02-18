@@ -7,44 +7,51 @@ router.get('/', (req, res) => {
   // find all tags
   // be sure to include its associated Product data
 
-  router.get('/', (req, res) => {
-    Tag.findAll({
-      include: Product, // Include the Product model
+  Tag.findAll({
+    include: [
+      {
+        model: Product,
+        through: ProductTag,
+      },
+    ],
+  })
+    .then((tagData) => {
+      res.json(tagData);
     })
-      .then((tagData) => {
-        res.json(tagData);
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).json(err);
-      });
-  });
-
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json(err);
+    });
 });
+
 
 router.get('/:id', (req, res) => {
   // find a single tag by its `id`
   // be sure to include its associated Product data
-  try {
-    const singletag = Tag.findByOne(req.params.id, {
-      include: [{ model: Product }],
-    });
-
-    if (!tagData) {
-      res.status(404).json({ message: 'No tag with that id ' });
-      return;
+  Tag.findOne(
+    {
+      // Gets the book based on the isbn given in the request parameters
+      include: [
+        {
+          model: Product,
+          through: ProductTag,
+        },
+      ],
+      where: {
+        id: req.params.id
+      },
     }
-
-    res.status(200).json(idData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+  ).then((tagData) => {
+    res.json(tagData);
+  });
 });
+
 
 router.post('/', (req, res) => {
   // create a new tag
 
   Tag.create({
+    //include: [Product],
     id: req.body.id,
     tag_name: req.body.tag_name
   })
@@ -80,10 +87,12 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete on tag by its `id` value
-
+console.log("delete route top level")
   Tag.destroy({
     where: {
       id: req.params.id,
+      tag_name: req.params.tag_name,
+      products: req.params.products
     },
   })
     .then((deletedTag) => {
